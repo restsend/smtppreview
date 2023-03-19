@@ -1,0 +1,9 @@
+go.sum
+*.db
+*~
+smtppreview
+node_modules
+yarn.lock
+mails
+package-lock.json
+ui/dist
