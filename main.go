@@ -1,10 +1,13 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"io"
 	"log"
+	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/emersion/go-smtp"
@@ -30,6 +33,12 @@ func checkValue(key, defaultVal string) string {
 	}
 	return v
 }
+
+//go:embed ui/dist/assets/*
+var assets embed.FS
+
+//go:embed ui/dist/index.html
+var indexHtml string
 
 func main() {
 
@@ -114,6 +123,15 @@ func main() {
 	if err := carrot.InitCarrot(db, r); err != nil {
 		panic(err)
 	}
+
+	// Embed static file
+	r.GET("/assets/*filepath", func(ctx *gin.Context) {
+		p := path.Join("ui/dist/", ctx.Request.RequestURI)
+		ctx.FileFromFS(p, http.FS(assets))
+	})
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.Data(http.StatusOK, "text/html", []byte(indexHtml))
+	})
 
 	RegisterHandlers(r.Group("/api/"), be)
 	r.Run(httpServerAddr)

@@ -1,11 +1,19 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
+	_ "embed"
+
+	"github.com/DusanKasan/parsemail"
 	"github.com/gin-gonic/gin"
 	"github.com/restsend/carrot"
 	"gorm.io/gorm"
@@ -26,6 +34,7 @@ func RegisterHandlers(r *gin.RouterGroup, be *Backend) {
 	routes.POST("/summary", handleSummary)
 	routes.POST("/config", handleGetConfig)
 	routes.POST("/config/edit", handleEditConfig)
+	routes.GET("/render/:id", handleRender)
 
 	carrot.RegisterObject(routes, &carrot.WebObject[Mail]{
 		Model:     Mail{},
@@ -104,4 +113,47 @@ func handleEditConfig(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, true)
+}
+
+func handleRender(c *gin.Context) {
+	be := getBackend(c)
+	mailid := c.Param("id")
+	var mail Mail
+	result := be.db.Take(&mail, "id", mailid)
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"err": result.Error.Error(),
+		})
+		return
+	}
+
+	name := path.Join(be.MailDir, mailid+".eml")
+	data, err := os.ReadFile(name)
+	if err != nil {
+		log.Println("open eml fail", name, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"err": result.Error.Error(),
+		})
+		return
+	}
+	msg, err := parsemail.Parse(bytes.NewReader(data)) // returns Email struct and error
+	if err != nil {
+		log.Println("parse eml fail", name, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"err": result.Error.Error(),
+		})
+	}
+
+	if msg.HTMLBody == "" {
+		c.Data(http.StatusOK, "text/plain", []byte(msg.TextBody))
+		return
+	}
+
+	htmlBody := msg.HTMLBody
+	for _, efile := range msg.EmbeddedFiles {
+		key := "cid:" + efile.CID
+		url := fmt.Sprintf("/api/raw/%s-%s", mail.ID, efile.CID)
+		htmlBody = strings.ReplaceAll(htmlBody, key, url)
+	}
+	c.Data(http.StatusOK, "text/html", []byte(htmlBody))
 }

@@ -136,9 +136,9 @@ async function onDeleteMail() {
                 </div>
             </div>
             <!-- Mail content -->
-            <div class="space-y-2 py-4 sm:space-y-4 sm:px-6 lg:px-8">
-                <div class="bg-white px-4 py-6 shadow sm:rounded-lg sm:px-6">
-                    <div v-html="message.body" />
+            <div class="space-y-2 py-4 sm:space-y-4 sm:px-6 lg:px-8 min-w-full">
+                <div class="bg-white px-4 py-6 shadow sm:rounded-lg sm:px-6 min-h-screen">
+                    <iframe :src="`/api/render/${message.id}`" class="min-w-full min-h-screen"></iframe>
                 </div>
             </div>
         </div>

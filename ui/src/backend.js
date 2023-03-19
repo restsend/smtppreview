@@ -8,7 +8,8 @@ export async function listMails(pos, keyword, limit = 20) {
     let req = await fetch(`${serveraddr}/api/mail/query`, {
         method: 'POST',
         body: JSON.stringify({
-            pos, keyword, limit
+            pos, keyword, limit,
+            orders: [{ name: 'createdAt', op: 'desc' }]
         })
     })
     return await req.json()

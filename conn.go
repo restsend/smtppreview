@@ -111,9 +111,9 @@ func (s *Session) Data(r io.Reader) (err error) {
 		s._mail.Subject = subject
 
 		s.Logger.Println(s.ID(), "Attachments", colorize(ColorBlue, strconv.Itoa(len(msg.Attachments))))
-		var attachments []Attachment
 
-		s._mail.TextBoby = msg.TextBody
+		s._mail.TextBody = msg.TextBody
+		var attachments []Attachment
 
 		for idx, att := range msg.Attachments {
 			ext := path.Ext(att.Filename)
@@ -138,8 +138,35 @@ func (s *Session) Data(r io.Reader) (err error) {
 				Size: len(attData),
 			})
 		}
+
 		data, _ := json.Marshal(attachments)
 		s._mail.Attachments = string(data)
+
+		var embeddedFiles []Attachment
+		for idx, efile := range msg.EmbeddedFiles {
+			storepath := fmt.Sprintf("%s-%s", s._mail.ID, efile.CID)
+			attData, err := io.ReadAll(efile.Data)
+			if err != nil {
+				s.Logger.Println(s.ID(), "Flush error EmbeddedFile idx:", idx, "cid:", efile.CID, err)
+				continue
+			}
+
+			err = os.WriteFile(path.Join(s.b.MailDir, storepath), attData, s.b.FilePerm)
+			if err != nil {
+				s.Logger.Println(s.ID(), "Flush error EmbeddedFile idx:", idx, "cid:", efile.CID, err)
+				continue
+			}
+
+			s.Logger.Println(s.ID(), "EmbeddedFile", colorize(ColorBlue, path.Join(s.b.MailDir, storepath)), "size", colorize(ColorBlue, strconv.Itoa(len(attData))))
+			embeddedFiles = append(embeddedFiles, Attachment{
+				Path: storepath,
+				Size: len(attData),
+			})
+		}
+
+		data, _ = json.Marshal(embeddedFiles)
+		s._mail.EmbeddedFiles = string(data)
+
 		name, err := current.Flush(s.b.db, s.b.MailDir, s.b.FilePerm)
 		if err != nil {
 			s.Logger.Println(s.ID(), "Flush error filename:", name, err)

@@ -17,29 +17,29 @@ import (
 )
 
 type Attachment struct {
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 	Path string `json:"path"`
 	Size int    `json:"size"`
 }
 
 // Mail
 type Mail struct {
-	ID          string       `json:"id" gorm:"size:20;primarykey"`
-	CreatedAt   time.Time    `json:"createdAt" gorm:"index"`
-	UpdatedAt   time.Time    `json:"updatedAt" gorm:"index"`
-	Opened      bool         `json:"opened" gorm:"index"`
-	OpenAt      sql.NullTime `json:"openAt"  gorm:"index"`
-	Score       int          `json:"score" gorm:"index"`
-	From        string       `json:"from" gorm:"size:100;index"`
-	To          string       `json:"to"`
-	Size        int          `json:"size"`
-	Subject     string       `json:"subject"`
-	Attachments string       `json:"attachments"`
-	RemoteAddr  string       `json:"remoteAddr,omitempty" gorm:"size:100"`
-	AuthName    string       `json:"authName,omitempty" gorm:"size:200"`
-	TextBoby    string       `json:"textBody"`
-	HtmlBoby    string       `json:"htmlBody" gorm:"-"`
-	RawBody     []byte       `json:"-" gorm:"-"`
+	ID            string       `json:"id" gorm:"size:20;primarykey"`
+	CreatedAt     time.Time    `json:"createdAt" gorm:"index"`
+	UpdatedAt     time.Time    `json:"updatedAt" gorm:"index"`
+	Opened        bool         `json:"opened" gorm:"index"`
+	OpenAt        sql.NullTime `json:"openAt"  gorm:"index"`
+	Score         int          `json:"score" gorm:"index"`
+	From          string       `json:"from" gorm:"size:100;index"`
+	To            string       `json:"to"`
+	Size          int          `json:"size"`
+	Subject       string       `json:"subject,omitempty"`
+	Attachments   string       `json:"attachments,omitempty"`
+	EmbeddedFiles string       `json:"embeddedFiles,omitempty"`
+	RemoteAddr    string       `json:"remoteAddr,omitempty" gorm:"size:100"`
+	AuthName      string       `json:"authName,omitempty" gorm:"size:200"`
+	TextBody      string       `json:"textBody,omitempty"`
+	RawBody       []byte       `json:"-" gorm:"-"`
 }
 
 func (m *Mail) IsValid() bool {
@@ -63,10 +63,18 @@ func (m *Mail) AfterDelete(tx *gorm.DB) (err error) {
 		log.Println("remove file fail", name, err)
 		return err
 	}
+
 	var attachments []Attachment
 	json.Unmarshal([]byte(m.Attachments), &attachments)
 	for _, att := range attachments {
 		name = path.Join(mailDir, att.Path)
+		os.Remove(name)
+	}
+
+	var embeddedFiles []Attachment
+	json.Unmarshal([]byte(m.EmbeddedFiles), &embeddedFiles)
+	for _, efile := range embeddedFiles {
+		name = path.Join(mailDir, efile.Path)
 		os.Remove(name)
 	}
 	return

@@ -3,6 +3,10 @@
 import { ref } from 'vue'
 import MailVue from './components/Mail.vue'
 import { getSummary, listMails, markMailOpened, deleteMail } from './backend'
+import TimeAgo from 'javascript-time-ago'
+// English.
+import en from 'javascript-time-ago/locale/en'
+
 import {
   Dialog,
   DialogPanel,
@@ -17,8 +21,11 @@ import {
 import {
   Cog6ToothIcon,
   MagnifyingGlassIcon,
+  PaperClipIcon
 } from '@heroicons/vue/24/outline'
 
+TimeAgo.addDefaultLocale(en)
+const timeAgo = new TimeAgo('en-US')
 const totalCount = ref(0)
 const totalSize = ref(0)
 const messages = ref([
@@ -87,6 +94,12 @@ async function onDeleteMail() {
   message.value = null
 }
 
+function hasAttachment(msg) {
+  if (msg.attachments) {
+    let files = JSON.parse(msg.attachments) || []
+    return files.length > 0
+  }
+}
 
 </script>
 <template>
@@ -165,11 +178,14 @@ async function onDeleteMail() {
                           <p class="truncate text-sm text-gray-500">{{ msg.subject }}</p>
                         </a>
                       </div>
-                      <time :datetime="msg.createdAt" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">{{
-                        new Date(msg.createdAt).toDateString() }}</time>
+                      <div class="flex justify-between">
+                        <time :datetime="msg.createdAt" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">{{
+                          timeAgo.format(new Date(msg.createdAt)) }}</time>
+                        <PaperClipIcon v-show="hasAttachment(msg)" class="mx-1 w-4 h-4"></PaperClipIcon>
+                      </div>
                     </div>
                     <div v-if="msg.textBody" class="mt-1">
-                      <p class="text-sm text-gray-600 line-clamp-2">{{ msg.textBody }}</p>
+                      <p class="text-sm text-gray-600 line-clamp-2">{{ msg.textBody.substr(0, 128) }}</p>
                     </div>
                   </a>
                 </li>
