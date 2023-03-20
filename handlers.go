@@ -36,7 +36,7 @@ func RegisterHandlers(r *gin.RouterGroup, be *Backend) {
 	routes.POST("/config/edit", handleEditConfig)
 	routes.GET("/render/:id", handleRender)
 
-	carrot.RegisterObject(routes, &carrot.WebObject[Mail]{
+	carrot.RegisterObject(routes, &carrot.WebObject{
 		Model:     Mail{},
 		Name:      "mail",
 		Editables: []string{"Opened", "OpenAt"},

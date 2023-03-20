@@ -2,22 +2,10 @@
 <script setup>
 import { ref } from 'vue'
 import MailVue from './components/Mail.vue'
-import { getSummary, listMails, markMailOpened, deleteMail } from './backend'
+import { getSummary, listMails, markMailOpened, deleteMail, hasAttachment } from './backend'
 import TimeAgo from 'javascript-time-ago'
 // English.
 import en from 'javascript-time-ago/locale/en'
-
-import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue'
-
 import {
   Cog6ToothIcon,
   MagnifyingGlassIcon,
@@ -26,46 +14,21 @@ import {
 
 TimeAgo.addDefaultLocale(en)
 const timeAgo = new TimeAgo('en-US')
+
 const totalCount = ref(0)
 const totalSize = ref(0)
-const messages = ref([
-  /*
-  {
-    id: 1,
-    subject: 'Velit placeat sit ducimus non sed',
-    sender: 'Gloria Roberston',
-    href: '#',
-    date: '1d ago',
-    datetime: '2021-01-27T16:35',
-    preview:
-      'SS',
-  },*/
-])
-/*
-const message = {
-  subject: 'Re: New pricing for existing customers',
-  from: 'joearmstrong@example.com',
-  to: 'bob@example.com',
-  datetime: '2021-01-27T16:35',
-  status: '90',
-  status_style: 'bg-cyan-100 text-cyan-800',
-  body: `<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Malesuada at ultricies tincidunt elit et, enim. Habitant nunc, adipiscing non fermentum, sed est a, aliquet. Lorem in vel libero vel augue aliquet dui commodo.</p>
-        <p>Nec malesuada sed sit ut aliquet. Cras ac pharetra, sapien purus vitae vestibulum auctor faucibus ullamcorper. Leo quam tincidunt porttitor neque, velit sed. Tortor mauris ornare ut tellus sed aliquet amet venenatis condimentum. Convallis accumsan et nunc eleifend.</p>
-        <p>– Joe</p>`,
-}
-*/
-
+const messages = ref([])
 const message = ref(null)
 const pos = ref(0)
 const keyword = ref('')
 
 getSummary().then((summary) => {
   totalCount.value = summary.totalCount
-  totalSize.value = (summary.totalSize / (1024 * 1024), 1).toFixed(1)
+  totalSize.value = (summary.totalSize / (1024 * 1024)).toFixed(2)
 })
 
 listMails().then((data) => {
-  messages.value = data.items
+  messages.value = data.items || []
 })
 
 async function onSelectMail(msg) {
@@ -76,7 +39,7 @@ async function onSelectMail(msg) {
 
 function onKeywordChanged() {
   listMails(pos.value, keyword.value).then((data) => {
-    messages.value = data.items
+    messages.value = data.items || []
   })
 }
 
@@ -94,12 +57,6 @@ async function onDeleteMail() {
   message.value = null
 }
 
-function hasAttachment(msg) {
-  if (msg.attachments) {
-    let files = JSON.parse(msg.attachments) || []
-    return files.length > 0
-  }
-}
 
 </script>
 <template>

@@ -31,3 +31,12 @@ export async function deleteMail(msgid) {
     })
     return await req.json()
 }
+
+
+
+export function hasAttachment(msg) {
+    if (msg.attachments) {
+        let files = JSON.parse(msg.attachments) || []
+        return files.length > 0
+    }
+}

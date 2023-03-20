@@ -34,11 +34,11 @@ func checkValue(key, defaultVal string) string {
 	return v
 }
 
-//go:embed ui/dist/assets/*
+//go:embed ui/dist/index.html ui/dist/assets/*
 var assets embed.FS
 
 //go:embed ui/dist/index.html
-var indexHtml string
+var indexHTML string
 
 func main() {
 
@@ -119,6 +119,8 @@ func main() {
 		}
 	}()
 
+	//gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {}
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	if err := carrot.InitCarrot(db, r); err != nil {
 		panic(err)
@@ -130,9 +132,10 @@ func main() {
 		ctx.FileFromFS(p, http.FS(assets))
 	})
 	r.GET("/", func(ctx *gin.Context) {
-		ctx.Data(http.StatusOK, "text/html", []byte(indexHtml))
+		ctx.Data(http.StatusOK, "text/html", []byte(indexHTML))
 	})
 
 	RegisterHandlers(r.Group("/api/"), be)
+	log.Println("Starting HTTP Server at", httpServerAddr)
 	r.Run(httpServerAddr)
 }

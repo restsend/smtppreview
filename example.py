@@ -41,9 +41,9 @@ with open("./ui/src/assets/logo.png", 'rb') as img:
     msg.get_payload()[1].add_related(img.read(), 'image', 'png',
                                      cid=asparagus_cid)
 
-#img_data = open('./ui/src/assets/logo.png', 'rb').read()
-# msg.add_attachment(img_data, maintype='image',
-#                   subtype='png', filename='logo.png')
+img_data = open('./ui/src/assets/logo.png', 'rb').read()
+msg.add_attachment(img_data, maintype='image',
+                   subtype='png', filename='logo.png')
 
 conn = smtplib.SMTP('localhost', port=9025)
 # Mock login

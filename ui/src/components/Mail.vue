@@ -1,10 +1,13 @@
 <script setup>
+import { ref } from 'vue'
+import { hasAttachment } from '../backend'
 import {
     TrashIcon,
     EnvelopeIcon,
     ChevronDownIcon,
     ChevronUpIcon,
     EllipsisVerticalIcon,
+    PaperClipIcon,
 } from '@heroicons/vue/24/outline'
 import {
     Dialog,
@@ -19,6 +22,7 @@ import {
 
 const props = defineProps(['message'])
 const emits = defineEmits(['ondelete', 'onunread'])
+const viewFrame = ref(null)
 
 async function onMarkUnread() {
     emits('onunread', props.message.id)
@@ -26,6 +30,27 @@ async function onMarkUnread() {
 
 async function onDeleteMail() {
     emits('ondelete', props.message.id)
+}
+
+async function onCopyContent() {
+
+}
+
+async function onViewOriginal() {
+    viewFrame.value.src = `/api/raw/${props.message.id}.eml`
+}
+
+function getAttachments() {
+    return JSON.parse(props.message.attachments) || []
+}
+
+function onDownloadAttachment(path, name) {
+    let link = document.createElement('A')
+    link.href = `/api/raw/${path}`
+    link.setAttribute('target', "_blank")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
 }
 
 </script>
@@ -98,6 +123,36 @@ async function onDeleteMail() {
                         <span class="inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium "
                             :class="message.status_style">{{
                                 message.status }}</span>
+                        <Menu v-if="hasAttachment(message)" as="div" class="relative ml-3 inline-block text-left">
+                            <div>
+                                <MenuButton
+                                    class="-my-2 flex items-center rounded-full bg-white p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                                    <span class="sr-only">Download attachments</span>
+                                    <PaperClipIcon class="h-5 w-5" aria-hidden="true" />
+                                </MenuButton>
+                            </div>
+
+                            <transition enter-active-class="transition ease-out duration-100"
+                                enter-from-class="transform opacity-0 scale-95"
+                                enter-to-class="transform opacity-100 scale-100"
+                                leave-active-class="transition ease-in duration-75"
+                                leave-from-class="transform opacity-100 scale-100"
+                                leave-to-class="transform opacity-0 scale-95">
+                                <MenuItems
+                                    class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                    <div class="py-1">
+                                        <MenuItem v-for="att in getAttachments(message)" :key="att.id">
+                                        <a href="#" class="text-gray-700 flex justify-between px-4 py-2 text-sm"
+                                            @click="onDownloadAttachment(att.path, att.name)">
+                                            <span>{{ att.name }}</span> <span class="text-gray-500">{{ (att.size / (1024 *
+                                                1024)).toFixed(2)
+                                            }}MB</span>
+                                        </a>
+                                        </MenuItem>
+                                    </div>
+                                </MenuItems>
+                            </transition>
+                        </Menu>
                         <Menu as="div" class="relative ml-3 inline-block text-left">
                             <div>
                                 <MenuButton
@@ -124,7 +179,8 @@ async function onDeleteMail() {
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }">
                                         <a href="#"
-                                            :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'flex justify-between px-4 py-2 text-sm']">
+                                            :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'flex justify-between px-4 py-2 text-sm']"
+                                            @click="onViewOriginal">
                                             <span>View original</span>
                                         </a>
                                         </MenuItem>
@@ -138,7 +194,7 @@ async function onDeleteMail() {
             <!-- Mail content -->
             <div class="space-y-2 py-4 sm:space-y-4 sm:px-6 lg:px-8 min-w-full">
                 <div class="bg-white px-4 py-6 shadow sm:rounded-lg sm:px-6 min-h-screen">
-                    <iframe :src="`/api/render/${message.id}`" class="min-w-full min-h-screen"></iframe>
+                    <iframe ref="viewFrame" :src="`/api/render/${message.id}`" class="min-w-full min-h-screen"></iframe>
                 </div>
             </div>
         </div>
