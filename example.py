@@ -1,10 +1,11 @@
 import smtplib
+import time
 # Here are the email package modules we'll need.
 from email.message import EmailMessage
 from email.utils import make_msgid
 # Create the container email message.
 msg = EmailMessage()
-msg['Subject'] = 'Hello SMTP Preview'
+msg['Subject'] = 'Hello SMTP Preview' + time.ctime()
 # me == the sender's email address
 # family = the list of all recipients' email addresses
 msg['From'] = 'you@restsend.com'

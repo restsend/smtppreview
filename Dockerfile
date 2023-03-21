@@ -2,7 +2,9 @@ FROM golang:1.19-bullseye as builder
 RUN mkdir /build 
 ADD . /build/
 WORKDIR /build 
-RUN CGO_ENABLED=1 GO111MODULE=on go build -o smtppreview .
+ENV CGO_ENABLED=1 GO111MODULE=on
+RUN go get ./... 
+RUN go build -o smtppreview .
 
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND noninteractive
