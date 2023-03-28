@@ -11,18 +11,10 @@ SMTP Preview  is maintained by [restsend.com](https://restsend.com/?from=smtppre
 >
 > SMTP Preview is written in Golang, and running smtppreview requires the Golang development environment. If you do not have the Golang development environment, you can refer to the official documentation of [golang](https://golang.org/?from=smtppreview).
 
-- Build `smtppreivew`
+- Run `smtppreivew` via docker, the default smtp serve port is `9025`
 
 ```shell
-git clone https://github.com/restsend/smtppreview.git
-cd smtppreview
-go build 
-```
-
-- Run `smtppreview`, the default serve port is `9025`
-
-```shell
-./smtppreview
+docker run -ti --rm -p 9025:9025 -p 8000:8000 restsend/smtppreview
 ```
 
 - Visit web console, `http://localhost:8000`
