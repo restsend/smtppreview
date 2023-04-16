@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/DusanKasan/parsemail"
 	"github.com/emersion/go-smtp"
 	"github.com/restsend/carrot"
-	"github.com/restsend/parsemail"
 )
 
 // A Session is returned after successful login.
