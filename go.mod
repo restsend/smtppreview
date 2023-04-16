@@ -13,6 +13,8 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
 
+replace github.com/DusanKasan/parsemail => ./parsemail
+
 // replace github.com/restsend/gormpher => ../../gormpher
 // replace github.com/restsend/parsemail => ../../restsend/parsemail
 

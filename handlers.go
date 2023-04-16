@@ -13,10 +13,10 @@ import (
 
 	_ "embed"
 
+	"github.com/DusanKasan/parsemail"
 	"github.com/gin-gonic/gin"
 	"github.com/restsend/carrot"
 	"github.com/restsend/gormpher"
-	"github.com/restsend/parsemail"
 	"gorm.io/gorm"
 )
 
