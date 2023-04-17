@@ -3,6 +3,7 @@ import time
 # Here are the email package modules we'll need.
 from email.message import EmailMessage
 from email.utils import make_msgid
+
 # Create the container email message.
 msg = EmailMessage()
 msg['Subject'] = 'Hello SMTP Preview' + time.ctime()

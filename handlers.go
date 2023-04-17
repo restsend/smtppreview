@@ -13,9 +13,10 @@ import (
 
 	_ "embed"
 
-	"github.com/DusanKasan/parsemail"
 	"github.com/gin-gonic/gin"
 	"github.com/restsend/carrot"
+	"github.com/restsend/gormpher"
+	"github.com/restsend/parsemail"
 	"gorm.io/gorm"
 )
 
@@ -36,17 +37,17 @@ func RegisterHandlers(r *gin.RouterGroup, be *Backend) {
 	routes.POST("/config/edit", handleEditConfig)
 	routes.GET("/render/:id", handleRender)
 
-	carrot.RegisterObject(routes, &carrot.WebObject{
-		Model:     Mail{},
-		Name:      "mail",
-		Editables: []string{"Opened", "OpenAt"},
-		Filters:   []string{"Opened", "OpenAt", "Score"},
-		Orders:    []string{"CreatedAt", "OpenAt", "Score"},
-		Searchs:   []string{"Subject", "From", "To"},
+	gormpher.RegisterObject(routes, &gormpher.WebObject{
+		Model:       Mail{},
+		Name:        "mail",
+		Editables:   []string{"Opened", "OpenAt"},
+		Filterables: []string{"Opened", "OpenAt", "Score"},
+		Orderables:  []string{"CreatedAt", "OpenAt", "Score"},
+		Searchables: []string{"Subject", "From", "To"},
 		GetDB: func(ctx *gin.Context, isCreate bool) *gorm.DB {
 			return be.db
 		},
-		AllowMethods: carrot.GET | carrot.DELETE | carrot.EDIT | carrot.QUERY,
+		AllowMethods: gormpher.GET | gormpher.DELETE | gormpher.EDIT | gormpher.QUERY,
 	})
 }
 

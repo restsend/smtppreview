@@ -2,7 +2,10 @@ module github.com/restsend/smtppreview
 
 go 1.19
 
-require github.com/restsend/carrot v0.0.0-20230320040726-7216e2458fef
+require (
+	github.com/restsend/carrot v0.0.0-20230414101657-69aa668a664f
+	github.com/restsend/gormpher v0.0.0-20230417103118-5a9ffe485c20
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -10,13 +13,16 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
 
+// replace github.com/restsend/gormpher => ../../gormpher
+// replace github.com/restsend/parsemail => ../../restsend/parsemail
+
 require (
 	github.com/DusanKasan/parsemail v1.2.0
-	github.com/bytedance/sonic v1.8.5 // indirect
+	github.com/bytedance/sonic v1.8.6 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/emersion/go-smtp v0.16.0
 	github.com/flosch/pongo2/v6 v6.0.0 // indirect
-	github.com/gin-contrib/sessions v0.0.5 // indirect
+	github.com/gin-contrib/sessions v0.0.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -33,8 +39,8 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/leodido/go-urn v1.2.2 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/mattn/go-isatty v0.0.18 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.7 // indirect

@@ -5,7 +5,7 @@ export async function getSummary() {
 }
 
 export async function listMails(pos, keyword, limit = 20) {
-    let req = await fetch(`/api/mail/query`, {
+    let req = await fetch(`/api/mail`, {
         method: 'POST',
         body: JSON.stringify({
             pos, keyword, limit,

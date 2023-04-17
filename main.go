@@ -41,7 +41,6 @@ var assets embed.FS
 var indexHTML string
 
 func main() {
-
 	log.Default().SetFlags(logFlags)
 
 	var smtpServerAddr string

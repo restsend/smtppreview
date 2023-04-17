@@ -163,8 +163,7 @@ async function onPrev(msgid) {
                 </div>
               </div>
               <div class="border-t border-b border-gray-200 bg-gray-50 px-6 py-2 text-sm font-medium text-gray-500">
-                Sorted
-                by date</div>
+                Sorted by date</div>
             </div>
             <nav aria-label="Message list" class="min-h-0 flex-1 overflow-y-auto">
               <ul role="list" class="divide-y divide-gray-200 border-b border-gray-200">

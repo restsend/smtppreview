@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/DusanKasan/parsemail"
 	"github.com/emersion/go-smtp"
 	"github.com/restsend/carrot"
+	"github.com/restsend/parsemail"
 )
 
 // A Session is returned after successful login.
@@ -28,6 +28,7 @@ type Session struct {
 func (s *Session) ID() string {
 	return colorize(ColorBlue, s.c.Conn().RemoteAddr().String())
 }
+
 func (s *Session) Current() *Mail {
 	if s._mail == nil {
 		uuid := carrot.GenUniqueKey(s.b.db.Model(&Mail{}), "id", carrot.GetIntValue(s.b.db, key_MAIL_UUID_SIZE, 8))
